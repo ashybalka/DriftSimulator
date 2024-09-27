@@ -18,11 +18,17 @@ public class GameManager : MonoBehaviour
 
     private float levelTimer = 120f;
 
+    private AudioSource Tires;
+
     void Start()
     {
         Time.timeScale = 1f;
         GameOverPanel.SetActive(false);
         driftText.gameObject.SetActive(false);
+        Tires = GetComponent<AudioSource>();
+
+
+
         StartCoroutine(IsDriftingRoutine());
     }
 
@@ -35,7 +41,6 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
         }
-
     }
 
     public void GameOver()
@@ -63,8 +68,9 @@ public class GameManager : MonoBehaviour
     {
         while (isDrifting)
         {
-            driftText.gameObject.SetActive(true);
+            TiresSoundPlay();
 
+            driftText.gameObject.SetActive(true);
             driftPoints += Time.deltaTime * 100f;  
             driftPointText.text = System.Math.Round(driftPoints, 2).ToString();  
 
@@ -72,7 +78,16 @@ public class GameManager : MonoBehaviour
         }
         yield return new WaitForSeconds(0.5f);
         driftText.gameObject.SetActive(false);
-
+        Tires.Stop();
         StartCoroutine(IsDriftingRoutine());
+    }
+
+    public void TiresSoundPlay()
+    {
+        if (!Tires.isPlaying)
+        {
+            new WaitForSeconds(0.25f);
+            Tires.Play();
+        }
     }
 }
