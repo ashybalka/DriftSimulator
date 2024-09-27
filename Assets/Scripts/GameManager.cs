@@ -10,7 +10,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Text driftText;
     [SerializeField] TMP_Text driftPointText;
     [SerializeField] TMP_Text levelTimerText;
-    [SerializeField] GameObject GameOverPanel;
+
+    [SerializeField] GameObject GameOverPanel, PausePanel;
+
+    [SerializeField] AudioSource TiresAudio, EngineAudio;
+
+    private Rigidbody Car_RB;
 
     public bool isDrifting;
 
@@ -18,16 +23,13 @@ public class GameManager : MonoBehaviour
 
     private float levelTimer = 120f;
 
-    private AudioSource Tires;
-
     void Start()
     {
+        Car_RB = GameObject.FindGameObjectWithTag("Car").GetComponent<Rigidbody>();
+
         Time.timeScale = 1f;
         GameOverPanel.SetActive(false);
         driftText.gameObject.SetActive(false);
-        Tires = GetComponent<AudioSource>();
-
-
 
         StartCoroutine(IsDriftingRoutine());
     }
@@ -41,6 +43,28 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (Time.timeScale == 1f)
+            {
+                PauseGame();
+            }
+            else if (Time.timeScale == 0f)
+            {
+                ResumeGame();
+            }
+        }
+
+        Debug.Log(Car_RB.velocity.magnitude);
+        if (Car_RB.velocity.magnitude > 3 && !EngineAudio.isPlaying)
+        {
+            EngineAudio.Play();
+        }
+        else if (Car_RB.velocity.magnitude <= 3 && EngineAudio.isPlaying)
+        {
+            EngineAudio.Stop();
+        } 
     }
 
     public void GameOver()
@@ -72,22 +96,35 @@ public class GameManager : MonoBehaviour
 
             driftText.gameObject.SetActive(true);
             driftPoints += Time.deltaTime * 100f;  
-            driftPointText.text = System.Math.Round(driftPoints, 2).ToString();  
+            driftPointText.text = Math.Round(driftPoints, 2).ToString();  
 
             yield return null;  
         }
         yield return new WaitForSeconds(0.5f);
         driftText.gameObject.SetActive(false);
-        Tires.Stop();
+        TiresAudio.Stop();
         StartCoroutine(IsDriftingRoutine());
     }
 
     public void TiresSoundPlay()
     {
-        if (!Tires.isPlaying)
+        if (!TiresAudio.isPlaying)
         {
             new WaitForSeconds(0.25f);
-            Tires.Play();
+            TiresAudio.Play();
         }
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0f;
+        AudioListener.pause = true;
+        PausePanel.SetActive(true);
+    }
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
+        AudioListener.pause = false;
+        PausePanel.SetActive(false);
     }
 }
