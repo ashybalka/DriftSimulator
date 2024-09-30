@@ -1,6 +1,7 @@
 using System.IO;
 using System;
 using UnityEngine;
+using System.Runtime.InteropServices;
 
 public class SaveLoadController : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class SaveLoadController : MonoBehaviour
     private string savePath;
 
     public static SaveLoadController Instance;
+
+    [DllImport("__Internal")]
+    private static extern void JS_FileSystem_Sync();
 
 
     void Awake()
@@ -22,12 +26,12 @@ public class SaveLoadController : MonoBehaviour
             Destroy(gameObject);
         }
 
-        savePath = Application.persistentDataPath + "/SaveData.json";
+        savePath = "idbfs/DriftSave/SaveData.json";
         LoadFromJson();
         SaveToJson();
     }
 
-        public void LoadFromJson()
+    public void LoadFromJson()
     {
         if (File.Exists(savePath))
         {
@@ -41,7 +45,12 @@ public class SaveLoadController : MonoBehaviour
 
     public void SaveToJson()
     {
+        if (!Directory.Exists("idbfs/DriftSave"))
+        {
+            Directory.CreateDirectory("idbfs/DriftSave");
+        }
         File.WriteAllText(savePath, JsonUtility.ToJson(_currencies));
+        Application.ExternalEval("_JS_FileSystem_Sync();");
     }
 
     [Serializable]
