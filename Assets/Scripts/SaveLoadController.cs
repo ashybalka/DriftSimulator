@@ -7,14 +7,27 @@ public class SaveLoadController : MonoBehaviour
     public Currencies _currencies = new();
     private string savePath;
 
+    public static SaveLoadController Instance;
+
+
     void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+
         savePath = Application.persistentDataPath + "/SaveData.json";
         LoadFromJson();
         SaveToJson();
     }
 
-    public void LoadFromJson()
+        public void LoadFromJson()
     {
         if (File.Exists(savePath))
         {

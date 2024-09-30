@@ -11,11 +11,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Text driftPointText;
     [SerializeField] TMP_Text levelTimerText;
 
+    [SerializeField] TMP_Text driftPointToMoneyText;
+
     [SerializeField] GameObject GameOverPanel, PausePanel;
 
     [SerializeField] AudioSource TiresAudio, EngineAudio;
 
     private Rigidbody Car_RB;
+    private SaveLoadController _saveLoadController;
 
     public bool isDrifting;
 
@@ -23,9 +26,12 @@ public class GameManager : MonoBehaviour
 
     private float levelTimer = 120f;
 
+    private bool isGameOver;
+
     void Start()
     {
         Car_RB = GameObject.FindGameObjectWithTag("Car").GetComponent<Rigidbody>();
+        _saveLoadController = GameObject.Find("SaveLoader").GetComponent<SaveLoadController>();
 
         Time.timeScale = 1f;
         GameOverPanel.SetActive(false);
@@ -39,8 +45,9 @@ public class GameManager : MonoBehaviour
         levelTimer -= Time.deltaTime;
         levelTimerText.text = TimeSpan.FromSeconds(levelTimer).ToString("mm':'ss");
 
-        if (levelTimer < 0f)
+        if (levelTimer < 0f && !isGameOver)
         {
+            isGameOver = true;
             GameOver();
         }
 
@@ -56,7 +63,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        Debug.Log(Car_RB.velocity.magnitude);
         if (Car_RB.velocity.magnitude > 3 && !EngineAudio.isPlaying)
         {
             EngineAudio.Play();
@@ -70,6 +76,15 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         Time.timeScale = 0f;
+        AudioListener.pause = true;
+        StopAllCoroutines();
+
+        int driftPointToMoney = (int)Math.Floor(driftPoints / 10d);
+        driftPointToMoneyText.text = driftPointToMoney.ToString() + " $";
+
+        _saveLoadController._currencies.Money += driftPointToMoney;
+        _saveLoadController.SaveToJson();
+
         GameOverPanel.SetActive(true);
     }
 

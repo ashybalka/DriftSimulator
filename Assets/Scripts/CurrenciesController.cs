@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using System;
 
 public class CurrenciesController : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class CurrenciesController : MonoBehaviour
 
     void Start()
     {
-        saveload= GameObject.Find("SaveLoader").GetComponent<SaveLoadController>();
+        saveload = GameObject.Find("SaveLoader").GetComponent<SaveLoadController>();
         UpdateCurrencies();
     }
 
