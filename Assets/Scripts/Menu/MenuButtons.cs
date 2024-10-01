@@ -5,20 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class MenuButtons : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] GameObject SelectLevelPanel;
+    public void StartGame(int Level)
     {
-        
+        SceneManager.LoadScene(2);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SelectLevel()
     {
-        
-    }
-
-    public void StartGame()
-    {
-        SceneManager.LoadScene(1);
+        SelectLevelPanel.SetActive(!SelectLevelPanel.activeInHierarchy);
     }
 }
