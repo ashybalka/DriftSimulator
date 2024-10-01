@@ -2,6 +2,7 @@ using System.IO;
 using System;
 using UnityEngine;
 using System.Runtime.InteropServices;
+using UnityEngine.SceneManagement;
 
 public class SaveLoadController : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class SaveLoadController : MonoBehaviour
     private static extern void JS_FileSystem_Sync();
 
 
-    void Awake()
+    void Start()
     {
         if (Instance == null)
         {
@@ -29,6 +30,11 @@ public class SaveLoadController : MonoBehaviour
         savePath = "idbfs/DriftSave/SaveData.json";
         LoadFromJson();
         SaveToJson();
+
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            SceneManager.LoadScene(1);
+        }
     }
 
     public void LoadFromJson()
@@ -36,6 +42,7 @@ public class SaveLoadController : MonoBehaviour
         if (File.Exists(savePath))
         {
             _currencies = JsonUtility.FromJson<Currencies>(File.ReadAllText(savePath));
+            Debug.Log("Successfully loaded currencies.");
         }
         else
         {

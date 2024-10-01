@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using GameAnalyticsSDK;
 
 public class GameManager : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        GameAnalytics.Initialize();
         Car_RB = GameObject.FindGameObjectWithTag("Car").GetComponent<Rigidbody>();
         _saveLoadController = GameObject.Find("SaveLoader").GetComponent<SaveLoadController>();
 
@@ -81,6 +83,8 @@ public class GameManager : MonoBehaviour
 
         int driftPointToMoney = (int)Math.Floor(driftPoints / 10d);
         driftPointToMoneyText.text = driftPointToMoney.ToString() + " $";
+
+        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "World1_Level1", driftPointToMoney);
 
         _saveLoadController._currencies.Money += driftPointToMoney;
         _saveLoadController.SaveToJson();
